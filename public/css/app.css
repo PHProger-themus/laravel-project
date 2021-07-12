@@ -28,6 +28,9 @@ label {
 .header {
     padding: 0.1vw;
     border-bottom: 0.3vw solid #7b0ece;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 .logo {
     line-height: 0;
@@ -44,6 +47,12 @@ label {
     background: #7b0ece;
     content: "";
     margin-right: 0.1vw;
+}
+.header .right_button {
+    margin-right: 2vw;
+}
+.header form {
+    margin: 0;
 }
 .container {
     display: flex;
@@ -94,4 +103,47 @@ label {
     width: 50%;
     margin: 0 auto;
     margin-top: 1.5vw;
+}
+.input_block {
+    position: relative;
+}
+.error {
+    position: absolute;
+    right: 0;
+    top: -0.5vw;
+    font-size: 0.7vw;
+    color: #f94d4d;
+}
+.error_block {
+    width: 80%;
+    padding: 1vw;
+    background: #f94d4d;
+    color: #fff;
+    margin: 0.5vw auto;
+    position: relative;
+}
+button.close {
+    position: absolute;
+    right: 1vw;
+    background: none;
+    border: none;
+    font-size: 1.5vw;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+    color: #fff;
+}
+.button {
+    background: #7b0ece;
+    color: #fff;
+    cursor: pointer;
+    width: auto;
+    padding: 0 1vw;
+    transition: 0.3s;
+    border: 0.2vw solid #7b0ece;
+}
+.button:hover {
+    background: none;
+    border: 0.2vw solid #7b0ece;
+    color: #7b0ece;
 }

@@ -14,6 +14,12 @@
 
         <div class="header">
             <p class="logo">BoguChat</p>
+            @if(Auth::check())
+                <form method="POST" action="{{ route('chat.logout') }}">
+                    @csrf
+                    <input type="submit" value="Выйти из чата" class="button right_button">
+                </form>
+            @endif
         </div>
 
         @yield('content')
