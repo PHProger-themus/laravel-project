@@ -13,3 +13,5 @@ Route::post('/auth', [ChatAuthController::class, 'auth'])->name('chat.auth');
 Route::post('/logout', [ChatAuthController::class, 'logout'])->name('chat.logout');
 
 Route::get('/chat', [ChatController::class, 'index'])->name('chat.chat');
+
+Route::post('/send', [ChatController::class, 'sendMessage'])->name('chat.send-message');

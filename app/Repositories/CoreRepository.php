@@ -8,7 +8,9 @@ abstract class CoreRepository
     protected $model;
 
     public function __construct() {
-        $this->model = app($this->getClass());
+        if ($this->getClass()) {
+            $this->model = app($this->getClass());
+        }
     }
 
     abstract protected function getClass();

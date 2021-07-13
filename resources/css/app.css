@@ -5,7 +5,6 @@ body {
     background: #f5f5f5;
     margin: 0;
     padding: 0;
-    height: 100%;
 }
 label, input {
     display: block;
@@ -243,11 +242,6 @@ button.close {
     background: #fff;
     box-shadow: 0 0 0.5vw #bbb;
     border-radius: 0.7vw;
-    padding: 1vw;
-    box-sizing: border-box;
-    overflow-y: scroll;
-    display: flex;
-    flex-wrap: wrap;
 }
 .input_field {
     display: flex;
@@ -262,8 +256,4 @@ button.close {
     height: 2vw;
     width: 18%;
     font-size: 0.9vw;
-}
-.msg {
-    margin: 0.1vw 0;
-    width: 100%;
 }

@@ -28,8 +28,8 @@ class UserRepository extends CoreRepository
         }
     }
 
-    public function getUserNickname() {
-        return $this->startQuery()->select('nickname')->where('id', Auth::id())->get()[0]->nickname;
+    public function getUser() {
+        return $this->startQuery()->select()->where('id', Auth::id())->get()[0];
     }
 
 }
