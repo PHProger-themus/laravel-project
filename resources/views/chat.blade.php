@@ -1,7 +1,7 @@
-@include('layouts.app')
-
 @section('content')
 
-    <p>Чат</p>
+    <p>{{ $name }}</p>
 
 @endsection
+
+@include('layouts.app')

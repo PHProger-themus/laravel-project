@@ -2,15 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserCreateRequest;
 use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Validator;
 
 class ChatAuthController extends Controller
 {
-    public function auth(UserCreateRequest $request)
+
+    private $userRepository;
+
+    public function __construct() {
+        $this->userRepository = app(UserRepository::class);
+    }
+
+    public function reg(Request $request)
     {
+
+        $validationRules = [
+            'nickname' => 'min:3|max:30|required|unique:users,nickname',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8'
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            $request->session()->flash('form', 'reg');
+            return back()->withErrors($validator, 'register')->withInput();
+        }
+
         $data = $request->input();
         $user = User::create($data);
 
@@ -18,16 +38,36 @@ class ChatAuthController extends Controller
             Auth::login($user);
             return redirect()->route('chat.chat')->with(['success', 'Здравствуйте, ' . $data['nickname'] . '! Добро пожаловать!']);
         } else {
-            return back()->withErrors(['error' => 'Неизвестная ошибка сохранения'])->withInput();
+            return back()->withErrors(['error' => 'Неизвестная ошибка сохранения'], 'register')->withInput();
         }
 
     }
 
     public function logout(Request $request) {
+        $this->userRepository->makeOffline(Auth::id());
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('chat.index');
+    }
+
+    public function auth(Request $request) {
+
+        $validationRules = [
+            'nickname' => 'min:3|max:30|required|exists:users,nickname',
+            'password' => 'required|min:8'
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return back()->withErrors($validator, 'auth')->withInput();
+        }
+
+        if (!$user = $this->userRepository->makeOnline($request->nickname, $request->password)) {
+            return back()->withErrors(['error' => 'Неверный пароль для пользователя ' . $request->nickname], 'auth')->withInput();
+        }
+        Auth::login($user);
+        return redirect()->route('chat.chat');
+
     }
 
 }

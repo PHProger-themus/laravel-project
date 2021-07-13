@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserObserver
 {
@@ -11,8 +12,13 @@ class UserObserver
         $user->color = 'rgb(' . rand(1, 255) . ',' . rand(1, 255) . ',' . rand(1, 255) . ')';
     }
 
+    public function hashPassword(User $user) {
+        $user->password = Hash::make($user->password);
+    }
+
     public function creating(User $user) {
         $this->generateColor($user);
+        $this->hashPassword($user);
     }
     /**
      * Handle the User "created" event.

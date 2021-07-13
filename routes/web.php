@@ -8,6 +8,7 @@ Route::get('/', function () {
     return view('index');
 })->name('chat.index');
 
+Route::post('/reg', [ChatAuthController::class, 'reg'])->name('chat.reg');
 Route::post('/auth', [ChatAuthController::class, 'auth'])->name('chat.auth');
 Route::post('/logout', [ChatAuthController::class, 'logout'])->name('chat.logout');
 
