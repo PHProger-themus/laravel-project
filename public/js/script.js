@@ -5,6 +5,10 @@ $(document).ready(function () {
         $('.switch_visible').removeClass('switch_visible');
         $('.' + $(this).attr('data-block')).addClass('block_visible');
         $(this).addClass('switch_visible');
-    })
+    });
+
+    $('button.close').on('click', function () {
+       $(this).parent().remove();
+    });
 
 });
