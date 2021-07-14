@@ -3,7 +3,8 @@
     <div class="chat_container">
         <div class="left_column">
             <div class="left_column_top">
-                <p class="nickname">Вы вошли как: <span class="user_nickname"><span style="color: {{ $user->color }}">{{ $user->nickname }}</span></span></p>
+                <input type="hidden" value="{{ $user->color }}" class="userColor" />
+                <p class="nickname">Вы вошли как: <span class="user_nickname"><span class="my_nickname" style="color: {{ $user->color }}">{{ $user->nickname }}</span></span></p>
                 <button class="button medium">Настройки</button>
             </div>
             <div class="left_column_group">
@@ -37,7 +38,13 @@
                 </div>
                 <div class="messages_field">
                     @foreach($messages as $message)
-                        <div class="msg"><span style="color: {{ $message->color }}">{{ $message->nickname }}</span>: {{ $message->message }}</div>
+                        <div @if ($message->nickname == \Illuminate\Support\Facades\Auth::user()->nickname) class="my_message" @endif>
+                            <div class="msg" style="background: {{ $message->color }}">
+                                <span class="msg_nick">{{ $message->nickname }}</span>
+                                {{ $message->message }}
+                                <span class="datetime">{{ $message->date }}</span>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             </div>

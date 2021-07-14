@@ -21,7 +21,7 @@ class ChatAuthController extends Controller
     {
 
         $validationRules = [
-            'nickname' => 'min:3|max:30|required|unique:users,nickname',
+            'nickname' => 'min:3|max:20|required|unique:users,nickname',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8'
         ];

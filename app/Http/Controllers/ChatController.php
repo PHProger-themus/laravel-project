@@ -26,7 +26,8 @@ class ChatController extends Controller
     }
 
     public function sendMessage(Request $request) {
-        DB::table('chat')->insert(['user_id' => Auth::id(), 'message' => $request->get('message')]);
+        $date = date('d.m.y в H:i');
+        DB::table('chat')->insert(['user_id' => Auth::id(), 'message' => $request->get('message'), 'date' => $date]);
     }
 
 }

@@ -246,8 +246,6 @@ button.close {
     padding: 1vw;
     box-sizing: border-box;
     overflow-y: scroll;
-    display: flex;
-    flex-wrap: wrap;
 }
 .input_field {
     display: flex;
@@ -265,5 +263,27 @@ button.close {
 }
 .msg {
     margin: 0.1vw 0;
-    width: 100%;
+    width: fit-content;
+    min-width: 13%;
+    max-width: 40%;
+    padding: 1.2vw 0.4vw;
+    border-radius: 0.3vw;
+    color: #fff;
+    position: relative;
+}
+.msg_nick {
+    position: absolute;
+    top: 0.15vw;
+    font-size: 0.6vw;
+    font-weight: bold;
+}
+.datetime {
+    position: absolute;
+    font-size: 0.5vw;
+    bottom: 0.25vw;
+    right: 0.4vw;
+}
+.my_message {
+    display: flex;
+    justify-content: flex-end;
 }
