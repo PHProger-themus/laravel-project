@@ -3,6 +3,8 @@ function addMessageBlock(color, user, message, my) {
     return (my ? "<div class='my_message'>" : "") + "<div class='msg' style='background: " + color + "'><span class='msg_nick'>" + user + "</span>" + message + "<span class='datetime'>" + date + "</span></div>" + (my ? "</div>" : "");
 }
 
+var type = 0;
+
 function cancelEditing() {
     type = 0;
     $('.message_input').val('').removeAttr('data-edit');
@@ -11,8 +13,6 @@ function cancelEditing() {
 }
 
 $(document).ready(function () {
-
-    var type = 0;
 
     CometServer().start({dev_id:2607});
 
