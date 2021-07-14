@@ -30,4 +30,13 @@ class ChatController extends Controller
         DB::table('chat')->insert(['user_id' => Auth::id(), 'message' => $request->get('message'), 'date' => $date]);
     }
 
+    public function editMessage(Request $request) {
+        $message = DB::table('chat')->select('user_id', 'message')->where('id', $request->get('id'))->get()->first();
+        if ($message->user_id == Auth::id()) {
+            DB::table('chat')->where('id', $request->get('id'))->update(['message' => $request->get('text')]);
+            return true;
+        }
+        return false;
+    }
+
 }

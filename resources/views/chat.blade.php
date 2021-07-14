@@ -34,14 +34,21 @@
                 <div class="input_field">
                     <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
                     <textarea class="message_input" placeholder="Ваше сообщение..."></textarea>
-                    <button class="button medium sendMessage">Отправить</button>
+                    <div class="chat_buttons">
+                        <button class="button medium cancelButton closed">Отмена</button>
+                        <button class="button medium sendMessage">Отправить</button>
+                    </div>
                 </div>
                 <div class="messages_field">
                     @foreach($messages as $message)
-                        <div @if ($message->nickname == \Illuminate\Support\Facades\Auth::user()->nickname) class="my_message" @endif>
+                        <div id="{{ $message->id }}" @if ($message->nickname == \Illuminate\Support\Facades\Auth::user()->nickname) class="my_message" @endif>
                             <div class="msg" style="background: {{ $message->color }}">
+                                <div class="buttons">
+                                    <span class="edit">✎</span>
+                                    <span class="delete">🗑</span>
+                                </div>
                                 <span class="msg_nick">{{ $message->nickname }}</span>
-                                {{ $message->message }}
+                                <span class="msgMessage">{{ $message->message }}</span>
                                 <span class="datetime">{{ $message->date }}</span>
                             </div>
                         </div>

@@ -15,3 +15,4 @@ Route::post('/logout', [ChatAuthController::class, 'logout'])->name('chat.logout
 Route::get('/chat', [ChatController::class, 'index'])->name('chat.chat');
 
 Route::post('/send', [ChatController::class, 'sendMessage'])->name('chat.send-message');
+Route::post('/edit', [ChatController::class, 'editMessage'])->name('chat.edit-message');
