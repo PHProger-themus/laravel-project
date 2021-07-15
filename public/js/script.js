@@ -68,6 +68,33 @@ function pinActions(id, message, on) {
 
 }
 
+function sendMessage() {
+    if (!type) {
+        let msg = $('.message_input').val();
+        let color = $('.userColor').val();
+        let nickname = $('.my_nickname').text();
+        $.post('/send', { _token: $('#token').val(), message : msg }, function(new_mes_id) {
+            CometServer().web_pipe_send("web_boguchat_newMessage", { "color" : color, "nickname" : nickname, "msg" : msg, "new_mes_id" : new_mes_id });
+            $('.messages_field').prepend(addMessageBlock(color, nickname, msg, new_mes_id, true));
+            $('.message_input').val('');
+        });
+    } else {
+        let id = $('.message_input').attr('data-edit');
+        let text = $('.message_input').val();
+        $.post('/edit', { _token: $('#token').val(), id : id, text : text }, function(accepted) {
+            CometServer().web_pipe_send("web_boguchat_editMessage", { "id" : id, "text" : text });
+            if (accepted) {
+                $('#' + id).find('.msgMessage').text(text);
+            }
+            cancelEditing();
+            if (id === $('.pinned').attr('data-pinned')) {
+                $('.pinned .message').text(': ' + text);
+                CometServer().web_pipe_send("web_boguchat_editData", {"type": 'pinned', "text": text});
+            }
+        });
+    }
+}
+
 $(document).ready(function () {
 
     CometServer().start({dev_id:2607});
@@ -83,29 +110,15 @@ $(document).ready(function () {
        $(this).parent().remove();
     });
 
-    $('.sendMessage').on('click', function () {
-        if (!type) {
-            let msg = $('.message_input').val();
-            let color = $('.userColor').val();
-            let nickname = $('.my_nickname').text();
-            $.post('/send', { _token: $('#token').val(), message : msg }, function(new_mes_id) {
-                CometServer().web_pipe_send("web_boguchat_newMessage", { "color" : color, "nickname" : nickname, "msg" : msg, "new_mes_id" : new_mes_id });
-                $('.messages_field').prepend(addMessageBlock(color, nickname, msg, new_mes_id, true));
-                $('.message_input').val('');
-            });
-        } else {
-            let id = $('.message_input').attr('data-edit');
-            let text = $('.message_input').val();
-            $.post('/edit', { _token: $('#token').val(), id : id, text : text }, function(accepted) {
-                CometServer().web_pipe_send("web_boguchat_editMessage", { "id" : id, "text" : text });
-                if (accepted) {
-                    $('#' + id).find('.msgMessage').text(text);
-                }
-                cancelEditing();
-                $('.pinned .message').text(': ' + text);
-                CometServer().web_pipe_send("web_boguchat_editData", { "type" : 'pinned', "text" : text });
-            });
+    $('.message_input').keydown(function(e) {
+        if(e.keyCode === 13) {
+            e.preventDefault();
+            sendMessage();
         }
+    });
+
+    $('.sendMessage').on('click', function () {
+        sendMessage();
     });
 
     $(document).on('mouseenter', '.msg', function () {
@@ -140,10 +153,10 @@ $(document).ready(function () {
 
     $('.popupDelete').on('click', function() {
         let id = $(this).attr('data-del');
-        $.post('/pin', { _token: $('#token').val(), id : id, pin : false }, function() {
-            CometServer().web_pipe_send("web_boguchat_pinMessage", { "id" : id, "message" : [], "pin" : false });
-            pinActions(id, [], false);
-        });
+        if (id === $('.pinned').attr('data-pinned')) {
+            $('.pinned').addClass('hidden');
+            CometServer().web_pipe_send("web_boguchat_editData", { "type" : 'unpinned' });
+        }
         $.post('/delete', { _token: $('#token').val(), id : id }, function(accepted) {
             CometServer().web_pipe_send("web_boguchat_deleteMessage", { "id" : id });
             if (accepted) {
@@ -217,6 +230,7 @@ $(document).ready(function () {
 
     CometServer().subscription("web_boguchat_editData", function(data) {
         if (data.data.type == 'pinned') $('.pinned .message').text(': ' + data.data.text);
+        else if (data.data.type == 'unpinned') $('.pinned').addClass('hidden');
     });
 
 });

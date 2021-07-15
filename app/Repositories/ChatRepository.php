@@ -37,7 +37,7 @@ class ChatRepository extends CoreRepository
     public function getPinnedMessage() {
         $msgs = \DB::table('chat')
             ->join('users', 'users.id', '=', 'chat.user_id')
-            ->select(['users.nickname', 'chat.message', 'chat.date'])
+            ->select(['users.nickname', 'chat.id', 'chat.message', 'chat.date'])
             ->where(['chat.is_pinned' => 1])
             ->get()->first();
 
