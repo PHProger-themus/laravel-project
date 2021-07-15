@@ -357,41 +357,49 @@ button.close {
     color: #fff;
     position: relative;
 }
+.msg.deleted {
+    transition: 0.3s;
+    transform: rotate(-10deg) translate(-10vw, -1vw);
+}
+.my_message .msg.deleted {
+    transition: 0.3s;
+    transform: rotate(10deg) translate(10vw, -1vw);
+}
 .msg_nick {
-    position: absolute;
-    top: 0.15vw;
-    font-size: 0.6vw;
-    font-weight: bold;
+position: absolute;
+top: 0.15vw;
+font-size: 0.6vw;
+font-weight: bold;
 }
 .datetime {
-    position: absolute;
-    font-size: 0.5vw;
-    bottom: 0.25vw;
-    right: 0.4vw;
+position: absolute;
+font-size: 0.5vw;
+bottom: 0.25vw;
+right: 0.4vw;
 }
 .my_message {
-    display: flex;
-    justify-content: flex-end;
+display: flex;
+justify-content: flex-end;
 }
 .msg .buttons {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    width: 2vw;
-    right: -1.6vw;
-    height: -moz-fit-content;
-    height: fit-content;
-    color: #000;
-    text-align: center;
-    font-size: 0.9vw;
-    display: none;
+position: absolute;
+top: 0;
+bottom: 0;
+margin: auto;
+width: 2vw;
+right: -1.6vw;
+height: -moz-fit-content;
+height: fit-content;
+color: #000;
+text-align: center;
+font-size: 0.9vw;
+display: none;
 }
 .my_message .buttons {
-    right: auto;
-    left: -1.6vw;
+right: auto;
+left: -1.6vw;
 }
 .msg .buttons span {
-    display: block;
-    cursor: pointer;
+display: block;
+cursor: pointer;
 }

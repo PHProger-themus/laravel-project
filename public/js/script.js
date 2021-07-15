@@ -1,6 +1,17 @@
-function addMessageBlock(color, user, message, my) {
+function addMessageBlock(color, user, message, new_mes_id, my) {
     let date = new Date().format('d.m.Y в H:i');
-    return (my ? "<div class='my_message'>" : "") + "<div class='msg' style='background: " + color + "'><span class='msg_nick'>" + user + "</span>" + message + "<span class='datetime'>" + date + "</span></div>" + (my ? "</div>" : "");
+    return "<div id='" + new_mes_id + "' class='msg_block " + (my ? "my_message" : "") + "'>" +
+                "<div class='msg' style='background: " + color + "'>" +
+                    "<div class='buttons'>" +
+                        "<span class='edit'>✎</span>" +
+                        "<span class='delete'>🗑</span>" +
+                    "</div>" +
+                    "<span class='like hidden'>❤<span class='qty'></span></span>" +
+                    "<span class='msg_nick'>" + user + "</span>" +
+                    "<span class='msgMessage'>" + message + "</span>" +
+                    "<span class='datetime'>" + date + "</span>" +
+                "</div>" +
+            "</div>";
 }
 
 function incrementLike(likeBlock, my) { //Добавляем лайк. Второй параметр - мы ли ставим лайк (в сокетах нужен false, чтобы у других людей ваш лайк не окрашивался как свой)
@@ -60,9 +71,9 @@ $(document).ready(function () {
             let msg = $('.message_input').val();
             let color = $('.userColor').val();
             let nickname = $('.my_nickname').text();
-            $.post('/send', { _token: $('#token').val(), message : msg }, function() {
-                CometServer().web_pipe_send("web_boguchat_newMessage", { "color" : color, "nickname" : nickname, "msg" : msg });
-                $('.messages_field').prepend(addMessageBlock(color, nickname, msg, true));
+            $.post('/send', { _token: $('#token').val(), message : msg }, function(new_mes_id) {
+                CometServer().web_pipe_send("web_boguchat_newMessage", { "color" : color, "nickname" : nickname, "msg" : msg, "new_mes_id" : new_mes_id });
+                $('.messages_field').prepend(addMessageBlock(color, nickname, msg, new_mes_id, true));
                 $('.message_input').val('');
             });
         } else {
@@ -79,7 +90,7 @@ $(document).ready(function () {
     });
 
     CometServer().subscription("web_boguchat_newMessage", function(message) {
-        $('.messages_field').prepend(addMessageBlock(message.data.color, message.data.nickname, message.data.msg, false));
+        $('.messages_field').prepend(addMessageBlock(message.data.color, message.data.nickname, message.data.msg, message.data.new_mes_id, false));
     });
 
     CometServer().subscription("web_boguchat_editMessage", function(message) {
@@ -87,7 +98,11 @@ $(document).ready(function () {
     });
 
     CometServer().subscription("web_boguchat_deleteMessage", function(message) {
-        $('#' + message.data.id).remove();
+        let msg = $('#' + message.data.id);
+        msg.find('.msg').addClass('deleted');
+        setTimeout(function () {
+            msg.remove();
+        }, 300);
     });
 
     CometServer().subscription("web_boguchat_likeMessage", function(message) {
@@ -99,18 +114,26 @@ $(document).ready(function () {
         }
     });
 
-    $('.msg').on({
-        'mouseenter' : function () {
-            if ($(this).parent().hasClass('my_message')) $(this).find('.buttons').fadeIn(100);
-            $(this).find('.like.hidden').fadeIn(100); //Показываем только спрятанные лайки, остальные и так видны
-        },
-        'mouseleave' : function () {
-            if ($(this).parent().hasClass('my_message')) $(this).find('.buttons').fadeOut(100);
-            $(this).find('.like.hidden').fadeOut(100);
-        },
+    $(document).on('mouseenter', '.msg', function () {
+        if ($(this).parent().hasClass('my_message')) $(this).find('.buttons').fadeIn(100);
+        $(this).find('.like.hidden').fadeIn(100); //Показываем только спрятанные лайки, остальные и так видны
+    });
+    $(document).on('mouseleave', '.msg', function () {
+        if ($(this).parent().hasClass('my_message')) $(this).find('.buttons').fadeOut(100);
+        $(this).find('.like.hidden').fadeOut(100);
     });
 
-    $('.edit').on('click', function() {
+    // $(document).on('.msg', {
+    //     'mouseenter' : function () {
+    //         console.log('gt');
+    //
+    //     },
+    //     'mouseleave' : function () {
+    //
+    //     },
+    // });
+
+    $(document).on('click', '.edit', function () {
         type = 1;
         msg = $(this).closest('.msg');
         $('.message_input').val(msg.find('.msgMessage').text()).attr('data-edit', msg.parent().attr('id'));
@@ -122,7 +145,7 @@ $(document).ready(function () {
         cancelEditing();
     });
 
-    $('.delete').on('click', function() {
+    $(document).on('click', '.delete', function () {
         $('.popup_back').fadeIn(300).addClass('visible');
         $('.popupDelete').attr('data-del', $(this).closest('.msg_block').attr('id'));
     });
@@ -136,13 +159,17 @@ $(document).ready(function () {
         $.post('/delete', { _token: $('#token').val(), id : id }, function(accepted) {
             CometServer().web_pipe_send("web_boguchat_deleteMessage", { "id" : id });
             if (accepted) {
-                $('#' + id).remove();
+                let msg = $('#' + id);
+                msg.find('.msg').addClass('deleted');
+                setTimeout(function () {
+                    msg.remove();
+                }, 300);
             }
             closePopup();
         });
     });
 
-    $('.like').on('click', function() {
+    $(document).on('click', '.like', function () {
         let id = $(this).closest('.msg_block').attr('id');
         $.post('/like', { _token: $('#token').val(), id : id }, function(liked) {
             CometServer().web_pipe_send("web_boguchat_likeMessage", { "id" : id, "liked" : liked });
