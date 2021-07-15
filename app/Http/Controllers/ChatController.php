@@ -43,6 +43,7 @@ class ChatController extends Controller
         $id = $request->get('id');
         if ($this->chatRepository->isAuthorOfMessage($id)) {
             DB::table('chat')->delete(['id' => $id]);
+            DB::table('likes')->where(['message_id' => $id])->delete();
             return true;
         }
         return false;
