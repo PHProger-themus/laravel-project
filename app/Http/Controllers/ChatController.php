@@ -47,4 +47,17 @@ class ChatController extends Controller
         }
         return false;
     }
+
+    public function likeMessage(Request $request) {
+        $id = $request->get('id');
+        $hasLike = DB::table('likes')->select('id')->where(['message_id' => $id, 'user_id' => Auth::id()])->get()->first();
+        if (!$hasLike) {
+            DB::table('likes')->insert(['message_id' => $id, 'user_id' => Auth::id()]);
+            return true;
+        } else {
+            DB::table('likes')->delete($hasLike->id);
+            return false;
+        }
+
+    }
 }

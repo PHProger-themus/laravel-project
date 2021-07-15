@@ -47,6 +47,7 @@
                                     <span class="edit">✎</span>
                                     <span class="delete">🗑</span>
                                 </div>
+                                <span class="like @if (!$message->likes_qty) hidden @endif ">❤@if ($message->likes_qty)<span class="qty filled @if ($message->my_like) my @endif">{{ $message->likes_qty }}</span> @else<span class="qty"></span> @endif </span>
                                 <span class="msg_nick">{{ $message->nickname }}</span>
                                 <span class="msgMessage">{{ $message->message }}</span>
                                 <span class="datetime">{{ $message->date }}</span>

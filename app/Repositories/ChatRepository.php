@@ -15,7 +15,14 @@ class ChatRepository extends CoreRepository
     }
 
     public function getMessages() {
-        $msgs = \DB::table('chat')->join('users', 'users.id', '=', 'chat.user_id')->select(['chat.message', 'users.color', 'users.nickname', 'chat.date', 'chat.id'])->orderBy('chat.id', 'DESC')->get();
+        $msgs = \DB::table('chat')
+            ->join('users', 'users.id', '=', 'chat.user_id')
+            ->leftJoin('likes', 'likes.message_id', '=', 'chat.id')
+            //->select(['chat.message', 'users.color', 'users.nickname', 'chat.date', 'chat.id'])
+            ->select(DB::raw('count(boch_likes.id) as likes_qty, SUM(boch_likes.user_id = ' . Auth::id() . ') as my_like, boch_chat.message, boch_users.color, boch_users.nickname, boch_chat.date, boch_chat.id'))
+            ->groupBy(['chat.id'])
+            ->orderBy('chat.id', 'desc')
+            ->get();
         return $msgs;
     }
 

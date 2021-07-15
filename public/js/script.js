@@ -3,6 +3,29 @@ function addMessageBlock(color, user, message, my) {
     return (my ? "<div class='my_message'>" : "") + "<div class='msg' style='background: " + color + "'><span class='msg_nick'>" + user + "</span>" + message + "<span class='datetime'>" + date + "</span></div>" + (my ? "</div>" : "");
 }
 
+function incrementLike(likeBlock, my) { //Добавляем лайк. Второй параметр - мы ли ставим лайк (в сокетах нужен false, чтобы у других людей ваш лайк не окрашивался как свой)
+    likeQty = likeBlock.find('.qty'); //Блок с кол-вом лайков
+    if (likeBlock.hasClass('hidden')) { //Если блок изначально спрятан, значит у него нет лайков
+        likeBlock.removeClass('hidden').fadeIn(100); //Покажем его (и насильно применим fadeIn, без него если пользователь поставит лайк и затем уберет резко мышь с сообщения, он исчезнет и больше не появится, так как у него теперь нет .hidden)
+        likeQty.addClass('filled').text('1'); //И поставим ему первый лайк
+    } else {
+        likeQty.text(parseInt(likeQty.text()) + 1); //Иначе же лайки уже стоят, и просто прибавим еще один
+    }
+    if (my) likeQty.addClass('my'); //Если это наш лайк, окрасим его в красный
+}
+
+function decrementLike(likeBlock, my) {
+    likeQty = likeBlock.find('.qty');
+    newQty = parseInt(likeQty.text()) - 1; //Вычтем лайк из кол-ва
+    if (!newQty) { //Если их стало 0
+        likeBlock.addClass('hidden'); //Спрячем блок
+        likeBlock.find('.qty').text(''); //И уберем кол-во
+    } else {
+        likeQty.text(newQty);
+    }
+    if (my) likeQty.removeClass('my'); //Уберем окраску лайка, так как мы убрали свой лайк
+}
+
 var type = 0;
 
 function cancelEditing() {
@@ -67,12 +90,23 @@ $(document).ready(function () {
         $('#' + message.data.id).remove();
     });
 
-    $('.my_message .msg').on({
+    CometServer().subscription("web_boguchat_likeMessage", function(message) {
+        let likeBlock = $('#' + message.data.id).find('.like');
+        if (message.data.liked) {
+            incrementLike(likeBlock, false);
+        } else {
+            decrementLike(likeBlock, false);
+        }
+    });
+
+    $('.msg').on({
         'mouseenter' : function () {
-            $(this).find('.buttons').fadeIn(100);
+            if ($(this).parent().hasClass('my_message')) $(this).find('.buttons').fadeIn(100);
+            $(this).find('.like.hidden').fadeIn(100); //Показываем только спрятанные лайки, остальные и так видны
         },
         'mouseleave' : function () {
-            $(this).find('.buttons').fadeOut(100);
+            if ($(this).parent().hasClass('my_message')) $(this).find('.buttons').fadeOut(100);
+            $(this).find('.like.hidden').fadeOut(100);
         },
     });
 
@@ -105,6 +139,19 @@ $(document).ready(function () {
                 $('#' + id).remove();
             }
             closePopup();
+        });
+    });
+
+    $('.like').on('click', function() {
+        let id = $(this).closest('.msg_block').attr('id');
+        $.post('/like', { _token: $('#token').val(), id : id }, function(liked) {
+            CometServer().web_pipe_send("web_boguchat_likeMessage", { "id" : id, "liked" : liked });
+            let likeBlock = $('#' + id).find('.like');
+            if (liked) {
+                incrementLike(likeBlock, true);
+            } else {
+                decrementLike(likeBlock, true);
+            }
         });
     });
 
