@@ -19,7 +19,10 @@ class ChatRepository extends CoreRepository
             ->join('users', 'users.id', '=', 'chat.user_id')
             ->leftJoin('likes', 'likes.message_id', '=', 'chat.id')
             //->select(['chat.message', 'users.color', 'users.nickname', 'chat.date', 'chat.id'])
-            ->select(DB::raw('count(boch_likes.id) as likes_qty, SUM(boch_likes.user_id = ' . Auth::id() . ') as my_like, boch_chat.message, boch_users.color, boch_users.nickname, boch_chat.date, boch_chat.id'))
+            ->select(DB::raw('count(boch_likes.id) as likes_qty,
+            SUM(boch_likes.user_id = ' . Auth::id() . ') as my_like,
+            (boch_chat.user_id = ' . Auth::id() . ') as my_mes,
+            boch_chat.message, boch_users.color, boch_users.nickname, boch_chat.date, boch_chat.id'))
             ->groupBy(['chat.id'])
             ->orderBy('chat.id', 'desc')
             ->get();
@@ -29,6 +32,16 @@ class ChatRepository extends CoreRepository
     public function isAuthorOfMessage(int $id) {
         $message = DB::table('chat')->select('user_id')->where('id', $id)->get()->first();
         return $message->user_id == Auth::id();
+    }
+
+    public function getPinnedMessage() {
+        $msgs = \DB::table('chat')
+            ->join('users', 'users.id', '=', 'chat.user_id')
+            ->select(['users.nickname', 'chat.message', 'chat.date'])
+            ->where(['chat.is_pinned' => 1])
+            ->get()->first();
+
+        return $msgs;
     }
 
 }

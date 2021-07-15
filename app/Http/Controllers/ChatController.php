@@ -21,8 +21,9 @@ class ChatController extends Controller
 
     public function index(Request $request) {
         $user = $this->userRepository->getUser();
-        $messages = $this->chatRepository->getMessages();
-        return view('chat', compact('user', 'messages'));
+        $chat_data['pinned'] = $this->chatRepository->getPinnedMessage();
+        $chat_data['messages'] = $this->chatRepository->getMessages();
+        return view('chat', compact('user', 'chat_data'));
     }
 
     public function sendMessage(Request $request) {
@@ -60,6 +61,26 @@ class ChatController extends Controller
             DB::table('likes')->delete($hasLike->id);
             return false;
         }
-
     }
+
+    public function pinMessage(Request $request) {
+        $id = $request->get('id');
+        if ($request->get('pin')) {
+            DB::table('chat')->where('is_pinned', 1)->update(['is_pinned' => 0]);
+            DB::table('chat')->where('id', $id)->update(['is_pinned' => 1]);
+            $message = DB::table('chat')
+                ->join('users', 'users.id', '=', 'chat.user_id')
+                ->select(['chat.message', 'chat.date', 'users.nickname'])
+                ->where('chat.id', $id)
+                ->get()->first();
+            return [
+                'nickname' => $message->nickname,
+                'message' => $message->message,
+                'date' => $message->date
+            ];
+        } else {
+            DB::table('chat')->where('is_pinned', 1)->update(['is_pinned' => 0]);
+        }
+    }
+
 }

@@ -85,7 +85,7 @@ label {
     top: -0.1vw;
     cursor: pointer;
 }
-.like.hidden {
+.like.hidden, .pinned.hidden {
     display: none;
 }
 .qty {
@@ -312,13 +312,13 @@ button.close {
     box-sizing: border-box;
 }
 .messages_field {
-    height: 84%;
+    height: 75%;
     background: #fff;
     box-shadow: 0 0 0.5vw #bbb;
     border-radius: 0.7vw;
     padding: 1vw;
     box-sizing: border-box;
-    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .input_field {
     display: flex;
@@ -383,7 +383,7 @@ justify-content: flex-end;
 }
 .msg .buttons {
 position: absolute;
-top: 0;
+top: -0.1vw;
 bottom: 0;
 margin: auto;
 width: 2vw;
@@ -402,4 +402,35 @@ left: -1.6vw;
 .msg .buttons span {
 display: block;
 cursor: pointer;
+}
+.pinned {
+    background: #7b0ece;
+    color: #fff;
+    padding: 0.8vw;
+    border-radius: 0.7vw;
+}
+.pin_t {
+    margin: 0;
+    font-size: 0.65vw;
+    font-weight: bold;
+}
+.pinned .mes {
+    margin-top: 0.3vw;
+    position: relative;
+}
+.pinned .date {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    font-size: 0.6vw;
+    color: #c3c3c3;
+    line-height: 1vw;
+}
+.pin {
+    font-size: 0.7vw;
+}
+.pinned a {
+    color: #f94d4d;
 }

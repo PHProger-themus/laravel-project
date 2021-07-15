@@ -18,3 +18,4 @@ Route::post('/send', [ChatController::class, 'sendMessage'])->name('chat.send-me
 Route::post('/edit', [ChatController::class, 'editMessage'])->name('chat.edit-message');
 Route::post('/delete', [ChatController::class, 'deleteMessage'])->name('chat.delete-message');
 Route::post('/like', [ChatController::class, 'likeMessage'])->name('chat.like-message');
+Route::post('/pin', [ChatController::class, 'pinMessage'])->name('chat.pin-message');
