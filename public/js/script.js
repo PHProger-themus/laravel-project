@@ -12,6 +12,11 @@ function cancelEditing() {
     $('.cancelButton').addClass('closed');
 }
 
+function closePopup() {
+    $('.popup_back').fadeOut(300).removeClass('visible');
+    $('.popupDelete').removeAttr('data-del');
+}
+
 $(document).ready(function () {
 
     CometServer().start({dev_id:2607});
@@ -58,6 +63,10 @@ $(document).ready(function () {
         $('#' + message.data.id).find('.msgMessage').text(message.data.text);
     });
 
+    CometServer().subscription("web_boguchat_deleteMessage", function(message) {
+        $('#' + message.data.id).remove();
+    });
+
     $('.my_message .msg').on({
         'mouseenter' : function () {
             $(this).find('.buttons').fadeIn(100);
@@ -69,7 +78,7 @@ $(document).ready(function () {
 
     $('.edit').on('click', function() {
         type = 1;
-        msg = $(this).parent().parent();
+        msg = $(this).closest('.msg');
         $('.message_input').val(msg.find('.msgMessage').text()).attr('data-edit', msg.parent().attr('id'));
         $('.sendMessage').text('Изменить');
         $('.cancelButton').removeClass('closed');
@@ -77,6 +86,26 @@ $(document).ready(function () {
 
     $('.cancelButton').on('click', function() {
         cancelEditing();
+    });
+
+    $('.delete').on('click', function() {
+        $('.popup_back').fadeIn(300).addClass('visible');
+        $('.popupDelete').attr('data-del', $(this).closest('.msg_block').attr('id'));
+    });
+
+    $('.popupCancel').on('click', function() {
+        closePopup();
+    });
+
+    $('.popupDelete').on('click', function() {
+        let id = $(this).attr('data-del');
+        $.post('/delete', { _token: $('#token').val(), id : id }, function(accepted) {
+            CometServer().web_pipe_send("web_boguchat_deleteMessage", { "id" : id });
+            if (accepted) {
+                $('#' + id).remove();
+            }
+            closePopup();
+        });
     });
 
 });

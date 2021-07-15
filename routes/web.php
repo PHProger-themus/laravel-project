@@ -16,3 +16,4 @@ Route::get('/chat', [ChatController::class, 'index'])->name('chat.chat');
 
 Route::post('/send', [ChatController::class, 'sendMessage'])->name('chat.send-message');
 Route::post('/edit', [ChatController::class, 'editMessage'])->name('chat.edit-message');
+Route::post('/delete', [ChatController::class, 'deleteMessage'])->name('chat.delete-message');

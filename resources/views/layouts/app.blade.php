@@ -26,6 +26,16 @@
             @endif
         </div>
 
+        <div class="popup_back">
+            <div class="popup">
+                <p>Вы действительно хотите удалить сообщение?</p>
+                <div class="button_group_popup">
+                    <button class="button inverted medium popupCancel">Отмена</button>
+                    <button class="button medium popupDelete">Удалить</button>
+                </div>
+            </div>
+        </div>
+
         @yield('content')
 
     </body>

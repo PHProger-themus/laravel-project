@@ -33,6 +33,43 @@ label {
 .text_center {
     text-align: center;
 }
+.popup_back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 2;
+    top: 0;
+    display: none;
+}
+.popup {
+    font-size: 1vw;
+    width: 26vw;
+    background: #fff;
+    border-radius: 0.6vw;
+    padding: 1vw;
+    padding-bottom: 4vw;
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    margin-top: 3vw;
+    transition: 0.3s;
+    transform: rotate(-10deg) translateY(-20vw);
+}
+.popup p {
+    margin: 0.5vw 0;
+}
+.popup_back.visible .popup {
+    transform: none;
+}
+.button_group_popup {
+    position: absolute;
+    bottom: 1.3vw;
+    left: 0;
+    right: 0;
+}
 .header {
     border-bottom: 0.3vw solid #7b0ece;
     display: flex;
@@ -149,6 +186,14 @@ button.close {
     transition: 0.3s;
     border: 0.2vw solid #7b0ece;
     border-radius: 0.7vw;
+}
+.button.inverted {
+    background: none;
+    color: #7b0ece;
+}
+.button.inverted:hover {
+    background: #7b0ece;
+    color: #fff;
 }
 .button.medium {
     width: 8vw;

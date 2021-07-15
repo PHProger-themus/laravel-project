@@ -41,7 +41,7 @@
                 </div>
                 <div class="messages_field">
                     @foreach($messages as $message)
-                        <div id="{{ $message->id }}" @if ($message->nickname == \Illuminate\Support\Facades\Auth::user()->nickname) class="my_message" @endif>
+                        <div id="{{ $message->id }}" class="msg_block @if ($message->nickname == \Illuminate\Support\Facades\Auth::user()->nickname) my_message @endif ">
                             <div class="msg" style="background: {{ $message->color }}">
                                 <div class="buttons">
                                     <span class="edit">✎</span>

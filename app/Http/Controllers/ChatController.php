@@ -31,12 +31,20 @@ class ChatController extends Controller
     }
 
     public function editMessage(Request $request) {
-        $message = DB::table('chat')->select('user_id', 'message')->where('id', $request->get('id'))->get()->first();
-        if ($message->user_id == Auth::id()) {
-            DB::table('chat')->where('id', $request->get('id'))->update(['message' => $request->get('text')]);
+        $id = $request->get('id');
+        if ($this->chatRepository->isAuthorOfMessage($id)) {
+            DB::table('chat')->where('id', $id)->update(['message' => $request->get('text')]);
             return true;
         }
         return false;
     }
 
+    public function deleteMessage(Request $request) {
+        $id = $request->get('id');
+        if ($this->chatRepository->isAuthorOfMessage($id)) {
+            DB::table('chat')->delete(['id' => $id]);
+            return true;
+        }
+        return false;
+    }
 }
