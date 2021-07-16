@@ -26,17 +26,44 @@
             @endif
         </div>
 
-        <div class="popup_back">
-            <div class="popup">
-                <p>Вы действительно хотите удалить сообщение?</p>
-                <div class="button_group_popup">
-                    <button class="button inverted medium popupCancel">Отмена</button>
-                    <button class="button medium popupDelete">Удалить</button>
+        @if(Auth::check())
+            <div class="chat_container">
+            <div class="popup_back">
+                <div class="popup">
+                    <p>Вы действительно хотите удалить сообщение?</p>
+                    <div class="button_group_popup">
+                        <button class="button inverted medium popupCancel">Отмена</button>
+                        <button class="button medium popupDelete">Удалить</button>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div class="left_column">
+                <div class="left_column_top">
+                    <input type="hidden" value="{{ $user->color }}" class="userColor" />
+                    <p class="nickname">Вы вошли как: <span class="user_nickname"><span class="my_nickname" style="color: {{ $user->color }}">{{ $user->nickname }}</span></span></p>
+                    <button class="button medium">Настройки</button>
+                </div>
+                <div class="left_column_group">
+                    <p class="left_column_group_heading">Действия</p>
+                    <a href="#">Комнаты</a>
+                </div>
+                @if($user->is_admin || $user->is_editor)
+                    <div class="left_column_group">
+                        <p class="left_column_group_heading">Управление</p>
+                        <a href="/settings/users">Пользователи</a>
+                        <a href="/settings/filters">Фильтры</a>
+                        <a href="/settings/chat">Чат</a>
+                    </div>
+                @endif
+            </div>
+        @endif
 
         @yield('content')
+
+        @if(Auth::check())
+            </div>
+        @endif
 
     </body>
 </html>

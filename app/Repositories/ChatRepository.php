@@ -22,6 +22,7 @@ class ChatRepository extends CoreRepository
             ->select(DB::raw('count(boch_likes.id) as likes_qty,
             SUM(boch_likes.user_id = ' . Auth::id() . ') as my_like,
             (boch_chat.user_id = ' . Auth::id() . ') as my_mes,
+            (boch_chat.user_id = ' . Auth::id() . ' OR ' . Auth::user()->is_admin . ') as can_modify,
             boch_chat.message, boch_users.color, boch_users.nickname, boch_chat.date, boch_chat.id'))
             ->groupBy(['chat.id'])
             ->orderBy('chat.id', 'desc')
@@ -31,7 +32,7 @@ class ChatRepository extends CoreRepository
 
     public function isAuthorOfMessage(int $id) {
         $message = DB::table('chat')->select('user_id')->where('id', $id)->get()->first();
-        return $message->user_id == Auth::id();
+        return $message->user_id == Auth::id() || Auth::user()->is_admin;
     }
 
     public function getPinnedMessage() {

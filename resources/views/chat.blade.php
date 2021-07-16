@@ -1,34 +1,5 @@
 @section('content')
 
-    <div class="chat_container">
-        <div class="left_column">
-            <div class="left_column_top">
-                <input type="hidden" value="{{ $user->color }}" class="userColor" />
-                <p class="nickname">Вы вошли как: <span class="user_nickname"><span class="my_nickname" style="color: {{ $user->color }}">{{ $user->nickname }}</span></span></p>
-                <button class="button medium">Настройки</button>
-            </div>
-            <div class="left_column_group">
-                <p class="left_column_group_heading">Действия</p>
-                <a href="#">Комнаты</a>
-            </div>
-            @if($user->is_admin)
-                <div class="left_column_group">
-                    <p class="left_column_group_heading">Администратор</p>
-                    <a href="#">Пользователи</a>
-                    <a href="#">Редакторы</a>
-                    <a href="#">Фильтры</a>
-                    <a href="#">Чат</a>
-                </div>
-            @endif
-            @if($user->is_editor)
-                <div class="left_column_group">
-                    <p class="left_column_group_heading">Редактор</p>
-                    <a href="#">Пользователи</a>
-                    <a href="#">Фильтры</a>
-                    <a href="#">Чат</a>
-                </div>
-            @endif
-        </div>
         <div class="active_field">
             <div class="chat">
                 <div class="pinned{{""}}@if(!$chat_data['pinned']) hidden @endif" data-pinned="@if($chat_data['pinned']){{ $chat_data['pinned']->id }}@endif">
@@ -54,7 +25,7 @@
                         <div id="{{ $message->id }}" class="msg_block{{""}}@if($message->my_mes) my_message{{""}}@endif">
                             <div class="msg" style="background: {{ $message->color }}">
                                 <div class="buttons">
-                                    @if($message->my_mes)
+                                    @if($message->can_modify)
                                         <span class="edit">✎</span>
                                         <span class="delete">🗑</span>
                                     @endif

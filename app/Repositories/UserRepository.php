@@ -22,6 +22,11 @@ class UserRepository extends CoreRepository
         if (Hash::check($password, $user->password)) {
             $user->status = 'online';
             $user->save();
+            /*if ($user->is_admin) {
+                session(['admin' => true]);
+            } else {
+                session(['admin' => false]);
+            }*/
             return $user;
         } else {
             return false;

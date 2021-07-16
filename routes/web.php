@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChatAuthController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,3 +20,7 @@ Route::post('/edit', [ChatController::class, 'editMessage'])->name('chat.edit-me
 Route::post('/delete', [ChatController::class, 'deleteMessage'])->name('chat.delete-message');
 Route::post('/like', [ChatController::class, 'likeMessage'])->name('chat.like-message');
 Route::post('/pin', [ChatController::class, 'pinMessage'])->name('chat.pin-message');
+
+Route::group(['prefix' => 'settings'], function () {
+    Route::get('users', [SettingsController::class, 'usersSettings'])->name('chat.settings.users');
+});
