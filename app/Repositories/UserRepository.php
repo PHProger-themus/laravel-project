@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\User as Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,8 +14,12 @@ class UserRepository extends CoreRepository
         return Model::class;
     }
 
-    public function makeOffline() {
+    public function makeOffline(Request $request) {
         $this->startQuery()->where('id', Auth::id())->update(['status' => 'offline']);
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('chat.index');
     }
 
     public function makeOnline(string $nickname, string $password) {
@@ -22,11 +27,6 @@ class UserRepository extends CoreRepository
         if (Hash::check($password, $user->password)) {
             $user->status = 'online';
             $user->save();
-            /*if ($user->is_admin) {
-                session(['admin' => true]);
-            } else {
-                session(['admin' => false]);
-            }*/
             return $user;
         } else {
             return false;

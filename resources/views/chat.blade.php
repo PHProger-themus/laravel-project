@@ -13,7 +13,6 @@
                         </div>
                     </div>
                 <div class="input_field">
-                    <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
                     <textarea class="message_input" placeholder="Ваше сообщение..."></textarea>
                     <div class="chat_buttons">
                         <button class="button medium cancelButton closed">Отмена</button>

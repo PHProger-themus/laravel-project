@@ -40,6 +40,7 @@
 
             <div class="left_column">
                 <div class="left_column_top">
+                    <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
                     <input type="hidden" value="{{ $user->color }}" class="userColor" />
                     <p class="nickname">Вы вошли как: <span class="user_nickname"><span class="my_nickname" style="color: {{ $user->color }}">{{ $user->nickname }}</span></span></p>
                     <button class="button medium">Настройки</button>

@@ -23,4 +23,5 @@ Route::post('/pin', [ChatController::class, 'pinMessage'])->name('chat.pin-messa
 
 Route::group(['prefix' => 'settings'], function () {
     Route::get('users', [SettingsController::class, 'usersSettings'])->name('chat.settings.users');
+    Route::post('deleteUser', [SettingsController::class, 'deleteUserAction'])->name('chat.settings.delete-user');
 });

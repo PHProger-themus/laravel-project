@@ -44,11 +44,7 @@ class ChatAuthController extends Controller
     }
 
     public function logout(Request $request) {
-        $this->userRepository->makeOffline(Auth::id());
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect()->route('chat.index');
+        return $this->userRepository->makeOffline($request);
     }
 
     public function auth(Request $request) {

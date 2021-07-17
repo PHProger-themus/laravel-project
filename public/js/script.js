@@ -199,6 +199,19 @@ $(document).ready(function () {
         });
     });
 
+    // Настройки
+
+    $('.deleteUser').on('click', function () {
+        let id = $(this).attr('id');
+        $.post('/settings/deleteUser', { _token: $('#token').val(), id : id }, function(error) {
+            if (error) {
+                alert('Пользователь онлайн. Удаление пользователей в режиме онлайн может привести к ошибке выполнения. Заблокируйте его, тогда он станет оффлайн и вы сможете его удалить.')
+            } else {
+                $(this).closest('.tduser').remove();
+            }
+        });
+    });
+
     CometServer().subscription("web_boguchat_newMessage", function(message) {
         $('.messages_field').prepend(addMessageBlock(message.data.color, message.data.nickname, message.data.msg, message.data.new_mes_id, false));
     });
@@ -229,8 +242,8 @@ $(document).ready(function () {
     });
 
     CometServer().subscription("web_boguchat_editData", function(data) {
-        if (data.data.type == 'pinned') $('.pinned .message').text(': ' + data.data.text);
-        else if (data.data.type == 'unpinned') $('.pinned').addClass('hidden');
+        if (data.data.type === 'pinned') $('.pinned .message').text(': ' + data.data.text);
+        else if (data.data.type === 'unpinned') $('.pinned').addClass('hidden');
     });
 
 });
