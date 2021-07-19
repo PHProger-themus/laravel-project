@@ -21,7 +21,7 @@
             @if(Auth::check())
                 <form method="POST" action="{{ route('chat.logout') }}">
                     @csrf
-                    <input type="submit" value="Выйти из чата" class="button right_button">
+                    <input type="submit" value="Выйти из чата" class="button right_button exitChat">
                 </form>
             @endif
         </div>
@@ -42,6 +42,7 @@
                 <div class="left_column_top">
                     <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
                     <input type="hidden" value="{{ $user->color }}" class="userColor" />
+                    <input type="hidden" value="{{ $user->id }}" class="userId" />
                     <p class="nickname">Вы вошли как: <span class="user_nickname"><span class="my_nickname" style="color: {{ $user->color }}">{{ $user->nickname }}</span></span></p>
                     <button class="button medium">Настройки</button>
                 </div>

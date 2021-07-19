@@ -31,11 +31,27 @@ class SettingsController extends Controller
         $user_id = $request->get('id');
         $user = User::all('id', 'is_admin', 'status')->find($user_id);
         if ($user->status == 'online') {
-            return 1;
+            return true;
         }
         elseif (!($user->is_admin || $user->id == Auth::id())) {
             User::find($user_id)->delete();
         }
     }
+
+    public function blockUserAction(Request $request) {
+        $user = User::find($request->get('id'));
+        if ($request->get('status') == 'banned') {
+            $user->status = 'offline';
+            $user->save();
+            return false;
+        } else {
+            $user->status = 'banned';
+            $user->save();
+            return true;
+        }
+
+
+    }
+
 
 }

@@ -14,22 +14,34 @@ class UserRepository extends CoreRepository
         return Model::class;
     }
 
-    public function makeOffline(Request $request) {
-        $this->startQuery()->where('id', Auth::id())->update(['status' => 'offline']);
+    public function makeOffline(Request $request = null) {
+        $user = $this->startQuery()->select(['status'])->where('id', Auth::id())->get()->first();
+        if ($user->status != 'banned') {
+            $this->startQuery()->where('id', Auth::id())->update(['status' => 'offline']);
+        }
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+//        if (!is_null($request)) {
+//            $request->session()->invalidate();
+//            $request->session()->regenerateToken();
+//        } else {
+            session()->invalidate();
+            session()->regenerateToken();
+//        }
         return redirect()->route('chat.index');
     }
 
     public function makeOnline(string $nickname, string $password) {
         $user = $this->startQuery()->where('nickname', $nickname)->get()->first();
         if (Hash::check($password, $user->password)) {
-            $user->status = 'online';
-            $user->save();
-            return $user;
+            if ($user->status == 'banned') {
+                return 2;
+            } else {
+                $user->status = 'online';
+                $user->save();
+                return $user;
+            }
         } else {
-            return false;
+            return 1;
         }
     }
 

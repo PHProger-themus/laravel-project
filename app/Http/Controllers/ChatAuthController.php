@@ -58,9 +58,16 @@ class ChatAuthController extends Controller
             return back()->withErrors($validator, 'auth')->withInput();
         }
 
-        if (!$user = $this->userRepository->makeOnline($request->nickname, $request->password)) {
-            return back()->withErrors(['error' => 'Неверный пароль для пользователя ' . $request->nickname], 'auth')->withInput();
+        $user = $this->userRepository->makeOnline($request->nickname, $request->password);
+
+        if (gettype($user) == 'integer') {
+            if ($user == 1) {
+                return back()->withErrors(['error' => 'Неверный пароль для пользователя ' . $request->nickname], 'auth')->withInput();
+            } elseif ($user == 2) {
+                return back()->withErrors(['error' => 'Пользователь ' . $request->nickname . ' был заблокирован администрацией чата'], 'auth')->withInput();
+            }
         }
+
         Auth::login($user);
         return redirect()->route('chat.chat');
 

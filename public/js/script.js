@@ -202,15 +202,42 @@ $(document).ready(function () {
     // Настройки
 
     $('.deleteUser').on('click', function () {
-        let id = $(this).attr('id');
+        let id = $(this).closest('.truser').attr('id');
         $.post('/settings/deleteUser', { _token: $('#token').val(), id : id }, function(error) {
             if (error) {
                 alert('Пользователь онлайн. Удаление пользователей в режиме онлайн может привести к ошибке выполнения. Заблокируйте его, тогда он станет оффлайн и вы сможете его удалить.')
             } else {
-                $(this).closest('.tduser').remove();
+                $(this).closest('.truser').remove();
             }
         });
     });
+
+    $('.exitChat').on('click', function () {
+        let id = $('.userId').val();
+        CometServer().web_pipe_send("web_boguchat_settingsUserOffline", { "id" : id });
+    });
+
+
+    $('.blockUser').on('click', function () {
+        let user = $(this).closest('.truser');
+        let id = user.attr('id');
+        let status = user.find('.status').text();
+        $.post('/settings/blockUser', { _token: $('#token').val(), id : id, status : status }, function(banned) {
+            if (banned) {
+                user.find('.status').html('<span style="color: red">banned</span>');
+                user.find('.blockUser').text('Разблокировать');
+            } else {
+                user.find('.status').html('<span style="color: #afafaf">offline</span>');
+                user.find('.blockUser').text('Заблокировать');
+            }
+        });
+    });
+
+    // $('.submit_auth').on('click', function () {
+    //     let id = $(this).closest('.truser').attr('id');
+    //     alert('works');
+    //     CometServer().web_pipe_send("web_boguchat_settingsUserOnline", { "id" : id });
+    // });
 
     CometServer().subscription("web_boguchat_newMessage", function(message) {
         $('.messages_field').prepend(addMessageBlock(message.data.color, message.data.nickname, message.data.msg, message.data.new_mes_id, false));
@@ -244,6 +271,15 @@ $(document).ready(function () {
     CometServer().subscription("web_boguchat_editData", function(data) {
         if (data.data.type === 'pinned') $('.pinned .message').text(': ' + data.data.text);
         else if (data.data.type === 'unpinned') $('.pinned').addClass('hidden');
+    });
+
+    // CometServer().subscription("web_boguchat_settingsUserOnline", function(data) {
+    //     alert(data.data.id);
+    //     $('#' + data.data.id).find('.status').html('<span style="color: #009a00">online</span>');
+    // });
+
+    CometServer().subscription("web_boguchat_settingsUserOffline", function(data) {
+        $('#' + data.data.id).find('.status').html('<span style="color: #afafaf">offline</span>');
     });
 
 });
