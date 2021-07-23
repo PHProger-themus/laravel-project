@@ -294,13 +294,14 @@ $(document).ready(function () {
         else if (data.data.type === 'unpinned') $('.pinned').addClass('hidden');
     });
 
-    CometServer().subscription("web_boguchat_settingsUserOnline", function(data) {
-        $('.user_nickname').each(function() {
-            if ($(this).text() === data.data.nickname) {
-                $(this).closest('.truser').find('.status').html('<span style="color: #009a00">online</span>');
-            }
-        });
-    });
+    // Нужно проверять ошибки валидации
+    // CometServer().subscription("web_boguchat_settingsUserOnline", function(data) {
+    //     $('.user_nickname').each(function() {
+    //         if ($(this).text() === data.data.nickname) {
+    //             $(this).closest('.truser').find('.status').html('<span style="color: #009a00">online</span>');
+    //         }
+    //     });
+    // });
 
     CometServer().subscription("web_boguchat_settingsUserOffline", function(data) {
         $('#' + data.data.id).find('.status').html('<span style="color: #afafaf">offline</span>');

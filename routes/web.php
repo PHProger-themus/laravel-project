@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('index');
-})->name('chat.index');
+})->name('chat.index')->middleware(['index.destroySession']);
 
 Route::post('/reg', [ChatAuthController::class, 'reg'])->name('chat.reg');
 Route::post('/auth', [ChatAuthController::class, 'auth'])->name('chat.auth');
 Route::post('/logout', [ChatAuthController::class, 'logout'])->name('chat.logout');
 
-Route::middleware(['autgh.check'])->group(function () {
+Route::middleware(['auth.check'])->group(function () {
 
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.chat');
 
