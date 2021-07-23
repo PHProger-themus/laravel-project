@@ -5,7 +5,7 @@
                 <div class="pinned{{""}}@if(!$chat_data['pinned']) hidden @endif" data-pinned="@if($chat_data['pinned']){{ $chat_data['pinned']->id }}@endif">
                         <p class="pin_t">Закрепленное сообщение <a href="#">Открепить</a></p>
                         <div class="mes">
-                            <span class="user">@if($chat_data['pinned']){{ $chat_data['pinned']->nickname }}@endif</span>
+                            <span class="user" data-owner="{{ $chat_data['pinned']->msg_owner }}">@if($chat_data['pinned']){{ $chat_data['pinned']->nickname }}@endif</span>
                             <span class="message">: @if($chat_data['pinned']){{ $chat_data['pinned']->message }}@endif</span>
                             <p class="date">
                                 @if($chat_data['pinned']){{ $chat_data['pinned']->date }}@endif
@@ -24,14 +24,12 @@
                         <div id="{{ $message->id }}" class="msg_block{{""}}@if($message->my_mes) my_message{{""}}@endif">
                             <div class="msg" style="background: {{ $message->color }}">
                                 <div class="buttons">
-                                    @if($message->can_modify)
-                                        <span class="edit">✎</span>
-                                        <span class="delete">🗑</span>
-                                    @endif
+                                    @if($message->can_modify || ($user->is_editor && $user->canModifyMessages))<span class="edit">✎</span>@endif
+                                    @if($message->can_modify || ($user->is_editor && $user->canDeleteMessages))<span class="delete">🗑</span>@endif
                                     <span class="pin">📌</span>
                                 </div>
                                 <span class="like{{""}}@if(!$message->likes_qty) hidden{{""}}@endif">❤@if($message->likes_qty)<span class="qty filled{{""}}@if ($message->my_like) my @endif">{{ $message->likes_qty }}</span>@else<span class="qty"></span>@endif</span>
-                                <span class="msg_nick">{{ $message->nickname }}</span>
+                                <span class="msg_nick" data-owner="{{ $message->msg_owner }}">{{ $message->nickname }}</span>
                                 <span class="msgMessage">{{ $message->message }}</span>
                                 <span class="datetime">{{ $message->date }}</span>
                             </div>

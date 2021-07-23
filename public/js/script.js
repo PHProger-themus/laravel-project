@@ -1,4 +1,4 @@
-function addMessageBlock(color, user, message, new_mes_id, my) {
+function addMessageBlock(color, user, message, new_mes_id, user_id, my) {
     let date = new Date().format('d.m.y в H:i');
     return "<div id='" + new_mes_id + "' class='msg_block " + (my ? "my_message" : "") + "'>" +
                 "<div class='msg' style='background: " + color + "'>" +
@@ -8,7 +8,7 @@ function addMessageBlock(color, user, message, new_mes_id, my) {
                         "<span class='pin'>📌</span>" +
                     "</div>" +
                     "<span class='like hidden'>❤<span class='qty'></span></span>" +
-                    "<span class='msg_nick'>" + user + "</span>" +
+                    "<span class='msg_nick' data-owner='" + user_id + "'>" + user + "</span>" +
                     "<span class='msgMessage'>" + message + "</span>" +
                     "<span class='datetime'>" + date + "</span>" +
                 "</div>" +
@@ -40,11 +40,14 @@ function decrementLike(likeBlock, my) {
 
 var type = 0;
 
-function cancelEditing() {
-    type = 0;
-    $('.message_input').val('').removeAttr('data-edit');
-    $('.sendMessage').text('Отправить');
-    $('.cancelButton').addClass('closed');
+function showPopup(message, buttons) {
+    $('.popup p').text(message);
+    buttonsHtml = "";
+    for (key in buttons) {
+        buttonsHtml += "<button class='button medium " + (key === 'popupCancel' ? 'inverted ' : '') + key + "'>" + buttons[key] + "</button>";
+    }
+    $('.button_group_popup').html(buttonsHtml);
+    $('.popup_back').fadeIn(300).addClass('visible');
 }
 
 function closePopup() {
@@ -52,13 +55,20 @@ function closePopup() {
     $('.popupDelete').removeAttr('data-del');
 }
 
-function pinActions(id, message, on) {
+function cancelEditing() {
+    type = 0;
+    $('.message_input').val('').removeAttr('data-edit');
+    $('.sendMessage').text('Отправить');
+    $('.cancelButton').addClass('closed');
+}
+
+function pinActions(id, user_id, message, on) {
     pinBlock = $('.pinned');
     if (on) {
         if (pinBlock.hasClass('hidden')) {
             pinBlock.removeClass('hidden');
         }
-        pinBlock.find('.user').text(message['nickname']);
+        pinBlock.find('.user').attr('data-owner', user_id).text(message['nickname']);
         pinBlock.find('.message').text(': ' + message['message']);
         pinBlock.find('.date').text(message['date']);
         pinBlock.attr('data-pinned', id);
@@ -73,9 +83,10 @@ function sendMessage() {
         let msg = $('.message_input').val();
         let color = $('.userColor').val();
         let nickname = $('.my_nickname').text();
+        let user_id = $('.userId').val();
         $.post('/send', { _token: $('#token').val(), message : msg }, function(new_mes_id) {
-            CometServer().web_pipe_send("web_boguchat_newMessage", { "color" : color, "nickname" : nickname, "msg" : msg, "new_mes_id" : new_mes_id });
-            $('.messages_field').prepend(addMessageBlock(color, nickname, msg, new_mes_id, true));
+            CometServer().web_pipe_send("web_boguchat_newMessage", { "color" : color, "nickname" : nickname, "msg" : msg, "new_mes_id" : new_mes_id, "user_id" : user_id });
+            $('.messages_field').prepend(addMessageBlock(color, nickname, msg, new_mes_id, user_id, true));
             $('.message_input').val('');
         });
     } else {
@@ -143,15 +154,15 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '.delete', function () {
-        $('.popup_back').fadeIn(300).addClass('visible');
+       showPopup('Вы действительно хотите удалить сообщение?', {'popupCancel' : 'Отмена', 'popupDelete' : 'Удалить'});
         $('.popupDelete').attr('data-del', $(this).closest('.msg_block').attr('id'));
     });
 
-    $('.popupCancel').on('click', function() {
+    $(document).on('click', '.popupCancel, .popupOK', function () {
         closePopup();
     });
 
-    $('.popupDelete').on('click', function() {
+    $(document).on('click', '.popupDelete', function () {
         let id = $(this).attr('data-del');
         if (id === $('.pinned').attr('data-pinned')) {
             $('.pinned').addClass('hidden');
@@ -185,17 +196,18 @@ $(document).ready(function () {
 
     $(document).on('click', '.pin', function () {
         let id = $(this).closest('.msg_block').attr('id');
+        let user_id = $('.userId').val();
         $.post('/pin', { _token: $('#token').val(), id : id, pin : true }, function(message) {
-            CometServer().web_pipe_send("web_boguchat_pinMessage", { "id" : id, "message" : message, "pin" : true });
-            pinActions(id, message, true);
+            CometServer().web_pipe_send("web_boguchat_pinMessage", { "id" : id, "user_id" : user_id, "message" : message, "pin" : true });
+            pinActions(id, user_id, message, true);
         });
     });
 
     $('.pinned a').on('click', function () {
         let id = $(this).closest('.pinned').attr('data-pinned');
         $.post('/pin', { _token: $('#token').val(), id : id, pin : false }, function() {
-            CometServer().web_pipe_send("web_boguchat_pinMessage", { "id" : id, "message" : [], "pin" : false });
-            pinActions(id, [], false);
+            CometServer().web_pipe_send("web_boguchat_pinMessage", { "id" : id, "user_id" : '', "message" : [], "pin" : false });
+            pinActions(id, '', [], false);
         });
     });
 
@@ -224,23 +236,32 @@ $(document).ready(function () {
         let status = user.find('.status').text();
         $.post('/settings/blockUser', { _token: $('#token').val(), id : id, status : status }, function(banned) {
             if (banned) {
+                CometServer().web_pipe_send("web_boguchat_settingsBlockUser", { "banned" : true, "id" : id });
+                CometServer().web_pipe_send("web_boguchat_configureUser", { "action" : 'ban' });
                 user.find('.status').html('<span style="color: red">banned</span>');
                 user.find('.blockUser').text('Разблокировать');
             } else {
+                CometServer().web_pipe_send("web_boguchat_settingsBlockUser", { "banned" : false, "id" : id });
                 user.find('.status').html('<span style="color: #afafaf">offline</span>');
                 user.find('.blockUser').text('Заблокировать');
             }
         });
     });
 
-    // $('.submit_auth').on('click', function () {
-    //     let id = $(this).closest('.truser').attr('id');
-    //     alert('works');
-    //     CometServer().web_pipe_send("web_boguchat_settingsUserOnline", { "id" : id });
-    // });
+    $('.submit_auth').on('click', function () {
+        let nickname = $('.nickname_auth').val();
+        CometServer().web_pipe_send("web_boguchat_settingsUserOnline", { "nickname" : nickname });
+    });
+
+    $('.edituser').on('click', function () {
+        let id = $('.edit_id').val();
+        let nickname = $('.edit_nickname').val();
+        let color = $('.edit_color').val();
+        CometServer().web_pipe_send("web_boguchat_configureUser", { action : "edit", "id" : id, "nickname" : nickname, "color" : color });
+    });
 
     CometServer().subscription("web_boguchat_newMessage", function(message) {
-        $('.messages_field').prepend(addMessageBlock(message.data.color, message.data.nickname, message.data.msg, message.data.new_mes_id, false));
+        $('.messages_field').prepend(addMessageBlock(message.data.color, message.data.nickname, message.data.msg, message.data.new_mes_id, message.data.user_id, false));
     });
 
     CometServer().subscription("web_boguchat_editMessage", function(message) {
@@ -265,7 +286,7 @@ $(document).ready(function () {
     });
 
     CometServer().subscription("web_boguchat_pinMessage", function(message) {
-        pinActions(message.data.id, message.data.message, message.data.pin);
+        pinActions(message.data.id, message.data.user_id, message.data.message, message.data.pin);
     });
 
     CometServer().subscription("web_boguchat_editData", function(data) {
@@ -273,13 +294,47 @@ $(document).ready(function () {
         else if (data.data.type === 'unpinned') $('.pinned').addClass('hidden');
     });
 
-    // CometServer().subscription("web_boguchat_settingsUserOnline", function(data) {
-    //     alert(data.data.id);
-    //     $('#' + data.data.id).find('.status').html('<span style="color: #009a00">online</span>');
-    // });
+    CometServer().subscription("web_boguchat_settingsUserOnline", function(data) {
+        $('.user_nickname').each(function() {
+            if ($(this).text() === data.data.nickname) {
+                $(this).closest('.truser').find('.status').html('<span style="color: #009a00">online</span>');
+            }
+        });
+    });
 
     CometServer().subscription("web_boguchat_settingsUserOffline", function(data) {
         $('#' + data.data.id).find('.status').html('<span style="color: #afafaf">offline</span>');
+    });
+
+    CometServer().subscription("web_boguchat_settingsBlockUser", function(data) {
+        user = $('#' + data.data.id);
+        if (data.data.banned) {
+            user.find('.status').html('<span style="color: red">banned</span>');
+            user.find('.blockUser').text('Разблокировать');
+        } else {
+            user.find('.status').html('<span style="color: #afafaf">offline</span>');
+            user.find('.blockUser').text('Заблокировать');
+        }
+    });
+
+    CometServer().subscription("web_boguchat_configureUser", function(data) {
+        if (data.data.action === 'edit') {
+            $('.msg_nick').each(function() {
+                if ($(this).attr('data-owner') === data.data.id) {
+                    $(this).closest('.msg').css('background-color', data.data.color);
+                    $(this).text(data.data.nickname);
+                }
+            });
+            if (data.data.id === $('.userId').val()) {
+                $('.my_nickname').css('color', data.data.color).text(data.data.nickname);
+                showPopup('Информация о Вас была изменена администратором', { 'popupOK' : 'ОК' })
+            }
+            if ($('.pinned .user').attr('data-owner') === data.data.id) {
+                $('.pinned .user').text(data.data.nickname);
+            }
+        } else if (data.data.action === 'ban') {
+            window.location.href = "/";
+        }
     });
 
 });

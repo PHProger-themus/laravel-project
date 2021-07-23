@@ -27,6 +27,7 @@
         </div>
 
         @if(Auth::check())
+
             <div class="chat_container">
             <div class="popup_back">
                 <div class="popup">
@@ -53,7 +54,7 @@
                 @if($user->is_admin || $user->is_editor)
                     <div class="left_column_group">
                         <p class="left_column_group_heading">Управление</p>
-                        <a href="/settings/users">Пользователи</a>
+                        <a href="{{ route('chat.settings.users') }}">Пользователи</a>
                         <a href="/settings/filters">Фильтры</a>
                         <a href="/settings/chat">Чат</a>
                     </div>

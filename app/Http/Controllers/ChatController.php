@@ -34,7 +34,8 @@ class ChatController extends Controller
 
     public function editMessage(Request $request) {
         $id = $request->get('id');
-        if ($this->chatRepository->isAuthorOfMessage($id)) {
+        $user = $this->userRepository->getUser();
+        if ($this->chatRepository->isAuthorOfMessage($id, $user) || ($user->is_editor && $user->canModifyMessages)) {
             DB::table('chat')->where('id', $id)->update(['message' => $request->get('text')]);
             return true;
         }
@@ -43,7 +44,8 @@ class ChatController extends Controller
 
     public function deleteMessage(Request $request) {
         $id = $request->get('id');
-        if ($this->chatRepository->isAuthorOfMessage($id)) {
+        $user = $this->userRepository->getUser();
+        if ($this->chatRepository->isAuthorOfMessage($id, $user) || ($user->is_editor && $user->canDeleteMessages)) {
             DB::table('chat')->delete(['id' => $id]);
             DB::table('likes')->where(['message_id' => $id])->delete();
             return true;

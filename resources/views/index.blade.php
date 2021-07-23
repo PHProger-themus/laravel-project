@@ -37,7 +37,7 @@
                         @error('nickname', 'auth')
                             <p class="error">{{ $message }}</p>
                         @enderror
-                        <input type="text" name="nickname" value="@if($errors->auth->count()){{ old('nickname') }}@endif" />
+                        <input type="text" name="nickname" class="nickname_auth" value="@if($errors->auth->count()){{ old('nickname') }}@endif" />
                     </div>
                     <div class="input_block">
                         <label for="email">Пароль:</label>

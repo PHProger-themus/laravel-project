@@ -30,6 +30,18 @@ input, textarea {
     border: none;
     resize: none;
 }
+input[type='checkbox'] {
+    width: 1vw;
+    display: inline-block;
+    vertical-align: middle;
+    height: 1vw;
+}
+input[type='color'] {
+    width: 5vw;
+    padding: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
 textarea {
     padding: 0.4vw 0.6vw;
 }
@@ -38,6 +50,11 @@ form {
 }
 label {
     font-size: 1vw;
+}
+.inline_label {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.5vw;
 }
 a:hover {
     text-decoration: none;
@@ -226,6 +243,14 @@ button.close {
     transition: 0.3s;
     border: 0.2vw solid #7b0ece;
     border-radius: 0.7vw;
+    text-decoration: none;
+}
+.button.right {
+    float: right;
+    margin-right: 2vw;
+}
+.button.middle {
+    font-size: 0.7vw;
 }
 .button.inverted {
     background: none;
@@ -457,4 +482,22 @@ cursor: pointer;
 .settings_table {
     border-collapse: collapse;
     width: 100%;
+}
+.infoBlock {
+    display: flex;
+}
+.main_info, .extra_info {
+    width: 50%;
+    padding: 1vw;
+}
+.status_user {
+    margin-left: 0.2vw;
+    font-size: 1vw;
+    font-weight: 500;
+}
+.subHeading {
+    margin-top: 0;
+}
+.inlineInput_line {
+    position: relative;
 }

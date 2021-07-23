@@ -13,7 +13,7 @@ Route::post('/reg', [ChatAuthController::class, 'reg'])->name('chat.reg');
 Route::post('/auth', [ChatAuthController::class, 'auth'])->name('chat.auth');
 Route::post('/logout', [ChatAuthController::class, 'logout'])->name('chat.logout');
 
-Route::middleware(['auth.check'])->group(function () {
+Route::middleware(['autgh.check'])->group(function () {
 
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.chat');
 
@@ -27,6 +27,8 @@ Route::middleware(['auth.check'])->group(function () {
         Route::get('users', [SettingsController::class, 'usersSettings'])->name('chat.settings.users');
         Route::post('deleteUser', [SettingsController::class, 'deleteUserAction'])->name('chat.settings.delete-user');
         Route::post('blockUser', [SettingsController::class, 'blockUserAction'])->name('chat.settings.block-user');
+        Route::get('editUser', [SettingsController::class, 'editUserAction'])->name('chat.settings.edit-user');
+        Route::post('modifyUser', [SettingsController::class, 'modifyUserAction'])->name('chat.settings.modify-user');
     });
 
 });
